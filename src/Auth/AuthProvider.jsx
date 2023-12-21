@@ -10,6 +10,7 @@ import {
   signOut,
 } from "firebase/auth";
 import app from "../components/Firebase/Firebase.config";
+
 export const AuthContext = createContext(null);
 const auth = getAuth(app);
 
@@ -55,7 +56,9 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
   const logOut = () => {
-    return signOut(auth);
+    return signOut(auth).then(() => {
+      setUser(null);
+    });
   };
 
   const userInfo = {

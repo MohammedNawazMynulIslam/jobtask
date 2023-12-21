@@ -21,11 +21,6 @@ const router = createBrowserRouter([
       },
 
       {
-        path: "/dashboard",
-        element: <Dashboard />,
-      },
-
-      {
         path: "/login",
         element: <Login></Login>,
       },
@@ -34,6 +29,11 @@ const router = createBrowserRouter([
         element: <Signup></Signup>,
       },
     ],
+  },
+
+  {
+    path: "/dashboard",
+    element: <Dashboard />,
   },
 ]);
 export default router;

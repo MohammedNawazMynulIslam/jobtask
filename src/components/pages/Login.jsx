@@ -1,20 +1,47 @@
 import Lottie from "lottie-react";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import animation from "../../assets/login.json";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../Auth/AuthProvider";
 import { useContext } from "react";
 import Swal from "sweetalert2";
+const notifySuccess = (message) => {
+  toast.success(message, {
+    position: "top-right",
+  });
+};
 export const Login = () => {
-  const { googleSignIn, GitSignIn } = useContext(AuthContext);
+  const { googleSignIn, GitSignIn, signIn } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // login with email and password
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const email = form.email.value;
+    const password = form.password.value;
+    signIn(email, password)
+      .then((result) => {
+        console.log(result.user);
+        notifySuccess("Login Successfully");
+        navigate(location?.state ? location.state : "/dashboard");
+      })
+      .catch((error) => {
+        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Invalid email or password!",
+        });
+      });
+  };
 
   // google login
   const handleGoogle = () => {
     googleSignIn().then((result) => {
       navigate(location?.state ? location.state : "/dashboard");
-      const googleEmail = result.email;
+      // const googleEmail = result.email;
 
       notifySuccess("Login Successfully").catch((error) => {
         console.error(error);
@@ -37,7 +64,7 @@ export const Login = () => {
   const handleGitHub = () => {
     GitSignIn().then((result) => {
       navigate(location?.state ? location.state : "/dashboard");
-      const GithubEmail = result.email;
+      // const GithubEmail = result.email;
       notifySuccess("Login Successfully").catch((error) => {
         console.error(error);
         Swal.fire({
@@ -64,13 +91,14 @@ export const Login = () => {
             <Lottie animationData={animation}></Lottie>
           </div>
           <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
-            <form className="card-body">
+            <form onSubmit={handleLogin} className="card-body">
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">Email</span>
                 </label>
                 <input
                   type="email"
+                  name="email"
                   placeholder="email"
                   className="input input-bordered"
                   required
@@ -82,15 +110,11 @@ export const Login = () => {
                 </label>
                 <input
                   type="password"
+                  name="password"
                   placeholder="password"
                   className="input input-bordered"
                   required
                 />
-                <label className="label">
-                  <a href="#" className="label-text-alt link link-hover">
-                    Forgot password?
-                  </a>
-                </label>
               </div>
               <div className="form-control mt-6">
                 <button className="btn btn-primary">Login</button>

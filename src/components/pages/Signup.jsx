@@ -1,15 +1,47 @@
 import Lottie from "lottie-react";
-import { ToastContainer } from "react-toastify";
+
+import { ToastContainer, toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import animation from "../../assets/signin.json";
 import { useContext } from "react";
 import { AuthContext } from "../../Auth/AuthProvider";
 export const Signup = () => {
-  const { googleSignIn, GitSignIn } = useContext(AuthContext);
+  const { googleSignIn, GitSignIn, createUser } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
 
+  const notifySuccess = (message) => {
+    toast.success(message, {
+      position: "top-center",
+    });
+  };
+
+  const notifyError = (message) => {
+    toast.error(message, {
+      position: "top-center",
+    });
+  };
+
+  // signup with email and password
+  const handleSignUp = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const email = form.email.value;
+    const password = form.password.value;
+    const name = form.name.value;
+
+    console.log(email, password, name);
+    createUser(email, password)
+      .then((result) => {
+        console.log(result);
+        notifySuccess("SignUp Successfully");
+      })
+      .catch((error) => {
+        console.log(error);
+        notifyError("Invalid email or password");
+      });
+  };
   // google signup
   const handleGoogle = () => {
     googleSignIn().then((result) => {
@@ -65,13 +97,14 @@ export const Signup = () => {
             <Lottie animationData={animation}></Lottie>
           </div>
           <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
-            <form className="card-body">
+            <form onSubmit={handleSignUp} className="card-body">
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">User Name</span>
                 </label>
                 <input
-                  type="name"
+                  type="text"
+                  name="name"
                   placeholder="user name"
                   className="input input-bordered"
                   required
@@ -83,6 +116,7 @@ export const Signup = () => {
                 </label>
                 <input
                   type="email"
+                  name="email"
                   placeholder="email"
                   className="input input-bordered"
                   required
@@ -95,6 +129,7 @@ export const Signup = () => {
                 <input
                   type="password"
                   placeholder="password"
+                  name="password"
                   className="input input-bordered"
                   required
                 />
