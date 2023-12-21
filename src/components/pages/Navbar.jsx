@@ -1,5 +1,16 @@
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../Auth/AuthProvider";
+
 const Navbar = () => {
+  const { user, logOut } = useContext(AuthContext);
+
+  const handleLogout = () => {
+    logOut().then((result) => {
+      console.log(result);
+    });
+  };
+
   return (
     <div className="">
       <h1>
@@ -32,14 +43,21 @@ const Navbar = () => {
                 className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
               >
                 <Link to="/">
-                  <a>Home</a>
+                  <button>Home</button>
                 </Link>
-                <Link to="/about">
-                  <a>About Us</a>
-                </Link>
-                <Link to="/service">
-                  <a>Services</a>
-                </Link>
+                {!user && (
+                  <Link to="/login">
+                    <button>Login</button>
+                  </Link>
+                )}
+                {user && (
+                  <>
+                    <Link to="/dashboard">
+                      <button>Dashboard</button>
+                    </Link>
+                    <button onClick={handleLogout}>Logout</button>
+                  </>
+                )}
               </ul>
             </div>
             <a className="btn btn-ghost text-xl">Set Priority</a>
@@ -51,16 +69,25 @@ const Navbar = () => {
                   <a>Home</a>
                 </Link>
               </li>
-              <li>
-                <Link to="/about">
-                  <a>About Us</a>
-                </Link>
-              </li>
-              <li>
-                <Link to={"/service"}>
-                  <a>Services</a>
-                </Link>
-              </li>
+              {!user && (
+                <li>
+                  <Link to="/login">
+                    <a>Login</a>
+                  </Link>
+                </li>
+              )}
+              {user && (
+                <>
+                  <li>
+                    <Link to="/dashboard">
+                      <a>Dashboard</a>
+                    </Link>
+                  </li>
+                  <li>
+                    <button onClick={handleLogout}>Logout</button>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
         </div>

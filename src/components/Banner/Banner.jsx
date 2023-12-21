@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export const Banner = () => {
   return (
     <div>
@@ -17,9 +19,11 @@ export const Banner = () => {
               List down all your works into a priority list, so that you can
               utilize the time effectively.
             </p>
-            <button className="btn btn-primary text-white">
-              Let’s Explore
-            </button>
+            <Link to={"/login"}>
+              <button className="btn btn-primary text-white">
+                Let’s Explore
+              </button>
+            </Link>
           </div>
         </div>
       </div>
