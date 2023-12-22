@@ -6,6 +6,8 @@ import About from "../components/pages/About";
 import { Login } from "../components/pages/login";
 import { Signup } from "../components/pages/Signup";
 import { Dashboard } from "../components/pages/Dashboard";
+import EditTask from "../components/pages/EditTask";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -34,6 +36,11 @@ const router = createBrowserRouter([
   {
     path: "/dashboard",
     element: <Dashboard />,
+  },
+
+  {
+    path: "/editTask/:id",
+    element: <EditTask />,
   },
 ]);
 export default router;

@@ -4,6 +4,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import Task from "./Task";
+import { useQuery } from "@tanstack/react-query";
 
 export const Dashboard = () => {
   const { user } = useContext(AuthContext);
@@ -28,6 +29,13 @@ export const Dashboard = () => {
     fetchTasks();
   }, []);
 
+  const { data: task = [], refetch } = useQuery({
+    queryKey: ["task"],
+    queryFn: async () => {
+      const res = await axios.get("http://localhost:9000/tasklist", {});
+      return res.data;
+    },
+  });
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewTask((prevTask) => ({ ...prevTask, [name]: value }));
