@@ -3,14 +3,7 @@ import { AuthContext } from "../../Auth/AuthProvider";
 import axios from "axios";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import Task from "../Task";
-
-const TASK_STATUS = {
-  TODO: "todo",
-  ONGOING: "ongoing",
-  COMPLETED: "completed",
-};
+import Task from "./Task";
 
 export const Dashboard = () => {
   const { user } = useContext(AuthContext);
@@ -46,6 +39,7 @@ export const Dashboard = () => {
         "http://localhost:9000/tasklist",
         newTask
       );
+
       setTasks((prevTasks) => [...prevTasks, response.data]);
       setNewTask({
         title: "",
@@ -54,12 +48,15 @@ export const Dashboard = () => {
         priority: "low",
       });
 
-      // Show a success pop-up
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: "Task added successfully",
-      });
+      // Introduce a small delay
+      setTimeout(() => {
+        // Show a success pop-up
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Task added successfully",
+        });
+      }, 100); // Adjust the delay as needed
     } catch (error) {
       console.error("Error adding task:", error);
 
@@ -72,50 +69,9 @@ export const Dashboard = () => {
     }
   };
 
-  const onDragEnd = async (result) => {
-    if (!result.destination) return;
-
-    const sourceStatus = result.source.droppableId;
-    const destinationStatus = result.destination.droppableId;
-
-    if (sourceStatus === destinationStatus) return;
-
-    const taskId = result.draggableId;
-
-    try {
-      // Update the task status in the backend
-      await axios.put(`http://localhost:9000/tasklist/${taskId}`, {
-        status: destinationStatus,
-      });
-
-      // Update the task status in the frontend
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === taskId ? { ...task, status: destinationStatus } : task
-        )
-      );
-
-      // Show a success pop-up
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: `Task moved to ${destinationStatus}`,
-      });
-    } catch (error) {
-      console.error("Error moving task:", error);
-
-      // Show an error pop-up
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: "Error moving task",
-      });
-    }
-  };
-
   return (
     <>
-      <div className="">
+      <div>
         {user && (
           <div className="flex">
             <div>
@@ -128,150 +84,95 @@ export const Dashboard = () => {
         )}
       </div>
       <div>
-        <h2 className="text-xl font-medium mt-4">Task Management</h2>
-        <form>
-          <label>
-            Title:
-            <input
-              type="text"
-              name="title"
-              value={newTask.title}
-              onChange={handleInputChange}
-            />
-          </label>
-          <label>
-            Description:
-            <textarea
-              name="description"
-              value={newTask.description}
-              onChange={handleInputChange}
-            ></textarea>
-          </label>
-          <label>
-            Deadline:
-            <input
-              type="date"
-              name="deadline"
-              value={newTask.deadline}
-              onChange={handleInputChange}
-            />
-          </label>
-          <label>
-            Priority:
-            <select
-              name="priority"
-              value={newTask.priority}
-              onChange={handleInputChange}
-            >
-              <option value="low">Low</option>
-              <option value="moderate">Moderate</option>
-              <option value="high">High</option>
-            </select>
-          </label>
-          <button type="button" onClick={handleAddTask}>
-            Add Task
-          </button>
-        </form>
-
-        <DragDropContext onDragEnd={onDragEnd}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <Droppable droppableId={TASK_STATUS.TODO}>
-              {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  className="task-list"
-                >
-                  <h3 className="text-lg font-medium mt-4">Todo list</h3>
-                  {tasks
-                    .filter((task) => task.status === TASK_STATUS.TODO)
-                    .map((task, index) => (
-                      <Draggable
-                        key={task.id}
-                        draggableId={task.id}
-                        index={index}
-                      >
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                          >
-                            <Task task={task} />
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                  {provided.placeholder}
+        <div className="hero bg-base-200">
+          <div className="hero-content flex-col">
+            <div className="text-center lg:text-left">
+              <h1 className="text-5xl font-bold">Task Management</h1>
+            </div>
+            <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+              <form className="card-body">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Title</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={newTask.title}
+                    onChange={handleInputChange}
+                    className="input input-bordered"
+                  />
                 </div>
-              )}
-            </Droppable>
 
-            <Droppable droppableId={TASK_STATUS.ONGOING}>
-              {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  className="task-list"
-                >
-                  <h3 className="text-lg font-medium mt-4">Ongoing</h3>
-                  {tasks
-                    .filter((task) => task.status === TASK_STATUS.ONGOING)
-                    .map((task, index) => (
-                      <Draggable
-                        key={task.id}
-                        draggableId={task.id}
-                        index={index}
-                      >
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                          >
-                            <Task task={task} />
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                  {provided.placeholder}
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Description</span>
+                  </label>
+                  <textarea
+                    className="input input-bordered"
+                    name="description"
+                    value={newTask.description}
+                    onChange={handleInputChange}
+                  ></textarea>
                 </div>
-              )}
-            </Droppable>
 
-            <Droppable droppableId={TASK_STATUS.COMPLETED}>
-              {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  className="task-list"
-                >
-                  <h3 className="text-lg font-medium mt-4">Completed</h3>
-                  {tasks
-                    .filter((task) => task.status === TASK_STATUS.COMPLETED)
-                    .map((task, index) => (
-                      <Draggable
-                        key={task.id}
-                        draggableId={task.id}
-                        index={index}
-                      >
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                          >
-                            <Task task={task} />
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                  {provided.placeholder}
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Deadline</span>
+                  </label>
+                  <input
+                    type="date"
+                    name="deadline"
+                    value={newTask.deadline}
+                    onChange={handleInputChange}
+                    className="input input-bordered"
+                  />
                 </div>
-              )}
-            </Droppable>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text">Priority</span>
+                  </label>
+                  <select
+                    className="input input-bordered"
+                    name="priority"
+                    value={newTask.priority}
+                    onChange={handleInputChange}
+                  >
+                    <option value="low">Low</option>
+                    <option value="moderate">Moderate</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+                <div className="form-control mt-6">
+                  <button
+                    onClick={handleAddTask}
+                    className="btn btn-primary text-white"
+                  >
+                    Add Task
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </DragDropContext>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <h2>TODO LIST</h2>
+            <div className="grid gap-3">
+              {tasks.map((task) => (
+                <Task key={task.id} task={task} />
+              ))}
+            </div>
+          </div>
+          <div>
+            <h2>Pending</h2>
+            {/* Content for Pending */}
+          </div>
+          <div>
+            <h2>Completed</h2>
+            {/* Content for Completed */}
+          </div>
+        </div>
       </div>
     </>
   );
