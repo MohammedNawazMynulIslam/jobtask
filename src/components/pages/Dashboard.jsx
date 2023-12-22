@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import Task from "./Task";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 
 export const Dashboard = () => {
   const { user } = useContext(AuthContext);
@@ -79,9 +80,9 @@ export const Dashboard = () => {
 
   return (
     <>
-      <div>
+      <div className="flex">
         {user && (
-          <div className="flex">
+          <div>
             <div>
               <h1 className="text-center my-6 font-medium text-2xl">
                 Welcome, {user.displayName}
@@ -91,6 +92,9 @@ export const Dashboard = () => {
           </div>
         )}
       </div>
+      <Link to={"/"}>
+        <button className="btn btn-primary mt-2">Home</button>
+      </Link>
       <div>
         <div className="hero bg-base-200">
           <div className="hero-content flex-col">
